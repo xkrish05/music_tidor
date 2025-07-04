@@ -1,0 +1,190 @@
+<style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+  
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+  
+    #av-wrapper {
+      /* border: 4px solid red; */
+      width: 100vw;
+      height: 100vh;
+      max-width: calc(100vh * 9 / 16);
+      aspect-ratio: 9 / 16;
+      background: transparent;
+      position: relative;
+      overflow: hidden;
+      margin: auto;
+  
+      box-sizing: border-box; /* include padding */
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .img-box {
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      height: 320px;
+      background: transparent;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .img-box img {
+      max-width: 100%;
+      max-height: auto;
+      object-fit: contain;
+    }
+  
+    .piano {
+      position: relative;
+      top: 70%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      padding: 0px;
+    }
+    .key {
+      width: 60px;
+      height: 240px;
+      border: 1px solid #333;
+      background: white;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+      box-shadow: inset 0 -4px 0 #ccc;
+      transition: background 0.1s;
+    }
+    .key:active {
+      background: #ddd;
+    }
+    .black {
+      width: 40px;
+      height: 150px;
+      background: black;
+      position: absolute;
+      z-index: 2;
+      box-shadow: inset 0 -4px 0 #222;
+      cursor: pointer;
+    }
+    .black:active {
+      background: #444;
+    }
+  </style>
+  
+  <div id="av-wrapper">
+    <div class="img-box">
+      <img src="your-image.png" alt="Centered Image" />
+    </div>
+    <div class="piano">
+      <div class="key" data-note="C"></div>
+      <div class="key" data-note="D"></div>
+      <div class="key" data-note="E"></div>
+      <div class="key" data-note="F"></div>
+      <div class="key" data-note="G"></div>
+      <div class="key" data-note="A"></div>
+      <div class="key" data-note="B"></div>
+  
+      <div class="black" data-note="C#" style="left: 45px;"></div>
+      <div class="black" data-note="D#" style="left: 105px;"></div>
+      <div class="black" data-note="F#" style="left: 225px;"></div>
+      <div class="black" data-note="G#" style="left: 285px;"></div>
+      <div class="black" data-note="A#" style="left: 345px;"></div>
+    </div>
+  </div>
+  
+  <script>
+const bgMusic = new Audio("background.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.22;
+
+const audioInstruction = new Audio("audio_instruction.mp3");
+audioInstruction.volume = 0.7;
+audioInstruction.loop = true;
+
+window.addEventListener("DOMContentLoaded", () => {
+  bgMusic.play().catch(() => {
+    document.body.addEventListener("click", () => {
+      bgMusic.play();
+    }, { once: true });
+  });
+
+  // Play instruction audio, and on failure, allow user to start it on click
+  audioInstruction.play().catch(() => {
+    document.body.addEventListener("click", () => {
+      audioInstruction.play();
+    }, { once: true });
+  });
+
+  // Always stop audio_instruction.mp3 on first user interaction
+  document.body.addEventListener("click", () => {
+    audioInstruction.pause();
+    audioInstruction.currentTime = 0;
+  }, { once: true });
+
+  createBubbles();
+});
+
+    const audioMap = {
+      'C': new Audio('C.mp3'),
+      'C#': new Audio('C_sharp.mp3'),
+      'D': new Audio('D.mp3'),
+      'D#': new Audio('D_sharp.mp3'),
+      'E': new Audio('E.mp3'),
+      'F': new Audio('F.mp3'),
+      'F#': new Audio('F_sharp.mp3'),
+      'G': new Audio('G.mp3'),
+      'G#': new Audio('G_sharp.mp3'),
+      'A': new Audio('A.mp3'),
+      'A#': new Audio('A_sharp.mp3'),
+      'B': new Audio('B.mp3')
+    };
+
+    const imageMap = {
+      'C': 'C.png',
+      'C#': 'C_sharp.png',
+      'D': 'D.png',
+      'D#': 'D_sharp.png',
+      'E': 'E.png',
+      'F': 'F.png',
+      'F#': 'F_sharp.png',
+      'G': 'G.png',
+      'G#': 'G_sharp.png',
+      'A': 'A.png',
+      'A#': 'A_sharp.png',
+      'B': 'B.png'
+    };
+
+    let currentAudio = null;
+  
+    document.querySelectorAll('[data-note]').forEach(key => {
+      key.addEventListener('click', () => {
+        const note = key.dataset.note;
+        const audio = audioMap[note];
+        if (audio) {
+          if (currentAudio && currentAudio !== audio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+          }
+          currentAudio = audio;
+          audio.currentTime = 0;
+          audio.play();
+
+          // Update image
+          const imgSrc = imageMap[note];
+          if (imgSrc) {
+            document.querySelector('.img-box img').src = imgSrc;
+          }
+        }
+      });
+    });
+  </script>
